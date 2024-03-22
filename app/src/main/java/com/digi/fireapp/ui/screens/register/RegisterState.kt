@@ -4,6 +4,9 @@ data class RegisterState(
     val email: String = "",
     val password: String = "",
     val username: String = "",
-    val isLoading: Boolean = false,
-    val error: String = ""
-)
+    val confirmPassword: String = "",
+    var isLoading: Boolean = false,
+    var error: String = "",
+    var isRegisterSuccess: Boolean = false,
+) {
+}

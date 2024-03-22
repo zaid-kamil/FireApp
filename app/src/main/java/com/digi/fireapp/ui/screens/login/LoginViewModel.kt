@@ -10,11 +10,9 @@ class LoginViewModel(): ViewModel() {
 
     fun onEvent(event: LoginEvent) {
         when (event) {
-            LoginEvent.OnNavigateToHome -> TODO()
             LoginEvent.OnNavigateToRegister -> TODO()
             LoginEvent.OnLogin -> TODO()
             is LoginEvent.SetEmail -> TODO()
-            is LoginEvent.SetError -> TODO()
             is LoginEvent.SetPassword -> TODO()
         }
     }
