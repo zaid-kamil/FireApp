@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1010520025718",
+    "project_id": "cloudapp-firestore-kotlin",
+    "storage_bucket": "cloudapp-firestore-kotlin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010520025718:android:2bb840549a2196550c0d57",
+        "android_client_info": {
+          "package_name": "com.digi.cloudapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1xa8PUsbETZWunMpDBGXnnIs6FJXatlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010520025718:android:948f9a1008cf7aaf0c0d57",
+        "android_client_info": {
+          "package_name": "com.digi.fireapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1xa8PUsbETZWunMpDBGXnnIs6FJXatlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
