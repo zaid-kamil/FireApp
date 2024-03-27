@@ -34,7 +34,12 @@ fun AppNavigation() {
         }
         composable(Screen.Register.route) {
             val vm: RegisterViewModel = viewModel()
-            RegisterScreen(state = vm.state.collectAsState().value, onEvent = vm::onEvent)
+            RegisterScreen(
+                state = vm.state.collectAsState().value,
+                onEvent = vm::onEvent,
+                onBack = {
+                    navController.popBackStack()
+                })
         }
         composable(Screen.Home.route) {
 
