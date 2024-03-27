@@ -25,7 +25,10 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {
             val vm: LoginViewModel = viewModel()
-            LoginScreen(state = vm.state.collectAsState().value, onEvent = vm::onEvent)
+            LoginScreen(state = vm.state.collectAsState().value, onEvent = vm::onEvent,
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
+                })
         }
         composable(Screen.Register.route) {
             val vm: RegisterViewModel = viewModel()
