@@ -16,7 +16,7 @@ class RegisterViewModel() : ViewModel() {
             RegisterEvent.OnNavigateToLogin -> TODO()
             RegisterEvent.OnSaveUser -> {
                 // there should be a validation here
-                authService.register(state.value)
+                authService.register(_state)
             }
 
             is RegisterEvent.SetConfirmPassword -> {

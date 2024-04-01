@@ -1,5 +1,6 @@
 package com.digi.fireapp.ui.screens.login
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,9 +9,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -45,9 +55,35 @@ fun LoginScreen(
                 )
         )
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.width(280.dp)
         ) {
             Text(text = "Login to FireApp", style = MaterialTheme.typography.headlineMedium)
+            AnimatedVisibility(visible = state.error.isNotBlank()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = state.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(
+                            onClick = { onEvent(LoginEvent.ClearError) },
+                            modifier = Modifier.size(18.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "close",
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+                }
+            }
             OutlinedTextField(
                 value = state.email,
                 onValueChange = { onEvent(LoginEvent.SetEmail(it)) },
@@ -67,9 +103,14 @@ fun LoginScreen(
                 colors = ButtonDefaults.elevatedButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                ),
+                enabled = state.isLoading.not()
             ) {
-                Text(text = "Login")
+                if (state.isLoading) {
+                    Icon(Icons.Default.Refresh, contentDescription = "Loading")
+                } else {
+                    Text(text = "Login")
+                }
             }
 
             Row {
@@ -82,6 +123,7 @@ fun LoginScreen(
                 )
             }
         }
+
     }
 }
 

@@ -6,32 +6,36 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class AuthService(
     private val auth: FirebaseAuth = Firebase.auth,
 ) {
-    fun login(state: LoginState) {
-        auth.signInWithEmailAndPassword(state.email, state.password)
+    fun login(state: MutableStateFlow<LoginState>) {
+        auth.signInWithEmailAndPassword(state.value.email, state.value.password)
             .addOnFailureListener {
-                state.error = it.message ?: "An error occurred"
-                state.isLoading = false
+                state.update { state ->
+                    state.copy(error = it.message ?: "An error occurred", isLoading = false)
+                }
             }.addOnSuccessListener {
-                state.isLoading = false
-                state.error = ""
-                state.isLoginSuccess = true
+                state.update { state ->
+                    state.copy(isLoginSuccess = true, isLoading = false, error = "")
+                }
             }
     }
 
-    fun register(state: RegisterState) {
-        auth.createUserWithEmailAndPassword(state.email, state.password)
+    fun register(state: MutableStateFlow<RegisterState>) {
+        auth.createUserWithEmailAndPassword(state.value.email, state.value.password)
             .addOnFailureListener {
-                state.error = it.message ?: "An error occurred"
-                state.isLoading = false
+                state.update { state ->
+                    state.copy(error = it.message ?: "An error occurred", isLoading = false)
+                }
             }.addOnSuccessListener {
-                state.isLoading = false
-                state.error = ""
-                state.isRegisterSuccess = true
-                val profileUpdates = userProfileChangeRequest { displayName = state.username }
+                state.update { state ->
+                    state.copy(isRegisterSuccess = true, isLoading = false, error = "")
+                }
+                val profileUpdates = userProfileChangeRequest { displayName = state.value.username }
                 it.user?.updateProfile(profileUpdates)
             }
     }
