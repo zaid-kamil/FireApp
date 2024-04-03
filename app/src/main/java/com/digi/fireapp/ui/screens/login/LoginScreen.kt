@@ -37,7 +37,11 @@ fun LoginScreen(
     state: LoginState = LoginState(),
     onEvent: (LoginEvent) -> Unit = {},
     onNavigateToRegister: () -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
 ) {
+    if (state.isLoginSuccess) {
+        onNavigateToHome()
+    }
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -104,12 +108,15 @@ fun LoginScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
-                enabled = state.isLoading.not()
+                enabled = !state.isLoading
             ) {
-                if (state.isLoading) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Loading")
-                } else {
-                    Text(text = "Login")
+                when {
+                    state.isLoading -> {
+                        Icon(Icons.Default.Refresh, contentDescription = "Loading")
+                    }
+                    else -> {
+                        Text(text = "Login")
+                    }
                 }
             }
 

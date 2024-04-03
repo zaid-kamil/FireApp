@@ -1,17 +1,25 @@
 package com.digi.fireapp.ui.screens.register
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,13 +37,21 @@ fun RegisterScreen(
     onEvent: (RegisterEvent) -> Unit = {},
     onBack: () -> Unit = {},
 ) {
+    if (state.isRegisterSuccess) {
+        onBack()
+    }
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.secondaryContainer))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+        )
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.width(280.dp)
         ) {
             IconButton(
                 onClick = { onBack() },
@@ -47,6 +63,32 @@ fun RegisterScreen(
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             Text(text = "Create free account", style = MaterialTheme.typography.headlineMedium)
+            AnimatedVisibility(visible = state.error.isNotBlank()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = state.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(
+                            onClick = { onEvent(RegisterEvent.ClearError) },
+                            modifier = Modifier.size(18.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "close",
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+                }
+            }
             OutlinedTextField(
                 value = state.email,
                 onValueChange = { onEvent(RegisterEvent.SetEmail(it)) },
@@ -56,7 +98,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = state.username,
                 onValueChange = { onEvent(RegisterEvent.SetUsername(it)) },
-                placeholder = { Text("Email") },
+                placeholder = { Text("Username") },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Person,
@@ -73,8 +115,9 @@ fun RegisterScreen(
                         imageVector = Icons.Default.Lock,
                         contentDescription = null
                     )
-                }
-            )
+                },
+
+                )
             OutlinedTextField(
                 value = state.confirmPassword,
                 onValueChange = { onEvent(RegisterEvent.SetConfirmPassword(it)) },
@@ -90,8 +133,13 @@ fun RegisterScreen(
                 Button(
                     onClick = { onEvent(RegisterEvent.OnSaveUser) },
                     shape = MaterialTheme.shapes.extraSmall,
+                    enabled = !state.isLoading
                 ) {
-                    Text("Register")
+                    if (state.isLoading) {
+                        Text(text = "Registering ...")
+                    } else {
+                        Text("Register")
+                    }
                 }
             }
         }

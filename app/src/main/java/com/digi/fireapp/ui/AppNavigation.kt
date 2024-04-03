@@ -30,6 +30,9 @@ fun AppNavigation() {
                 onEvent = vm::onEvent,
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
+                },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route)
                 })
         }
         composable(Screen.Register.route) {

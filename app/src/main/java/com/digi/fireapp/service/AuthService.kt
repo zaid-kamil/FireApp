@@ -1,5 +1,6 @@
 package com.digi.fireapp.service
 
+import android.util.Log
 import com.digi.fireapp.ui.screens.login.LoginState
 import com.digi.fireapp.ui.screens.register.RegisterState
 import com.google.firebase.auth.FirebaseAuth
@@ -13,6 +14,7 @@ class AuthService(
     private val auth: FirebaseAuth = Firebase.auth,
 ) {
     fun login(state: MutableStateFlow<LoginState>) {
+        Log.d("AuthService", "login: ${state.value.email} ${state.value.password}")
         auth.signInWithEmailAndPassword(state.value.email, state.value.password)
             .addOnFailureListener {
                 state.update { state ->
@@ -39,6 +41,4 @@ class AuthService(
                 it.user?.updateProfile(profileUpdates)
             }
     }
-
-    fun isUserLoggedIn() = auth.currentUser != null
 }

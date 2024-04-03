@@ -6,17 +6,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class RegisterViewModel() : ViewModel() {
+class RegisterViewModel(
+    private val authService: AuthService = AuthService(),
+) : ViewModel() {
     private val _state = MutableStateFlow(RegisterState())
     val state = _state.asStateFlow()
-    private val authService = AuthService()
-
     fun onEvent(event: RegisterEvent) {
         when (event) {
-            RegisterEvent.OnNavigateToLogin -> TODO()
             RegisterEvent.OnSaveUser -> {
-                // there should be a validation here
-                authService.register(_state)
+                try {
+                    authService.register(_state)
+                } catch (e: Exception) {
+                    _state.update {
+                        it.copy(error = e.message ?: "Some error occurred")
+                    }
+                }
             }
 
             is RegisterEvent.SetConfirmPassword -> {
@@ -33,6 +37,12 @@ class RegisterViewModel() : ViewModel() {
 
             is RegisterEvent.SetUsername -> {
                 _state.update { it.copy(username = event.username) }
+            }
+
+            RegisterEvent.ClearError -> {
+                _state.update { state ->
+                    state.copy(error = "")
+                }
             }
         }
     }

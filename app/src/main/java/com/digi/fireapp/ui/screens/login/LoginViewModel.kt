@@ -16,6 +16,7 @@ class LoginViewModel(
         when (event) {
             LoginEvent.OnLogin -> {
                 try{
+
                    authService.login(_state)
                 }catch (e: Exception){
                     _state.update { state ->
