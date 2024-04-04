@@ -22,6 +22,9 @@ class HomeViewModel(
     init {
         loadAllNotes()
         loadAllUploads()
+        _state.update {
+            it.copy(username = auth.currentUser?.displayName ?: "Guest")
+        }
     }
 
     fun onEvent(event: HomeEvent) {
