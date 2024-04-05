@@ -12,6 +12,8 @@ import com.digi.fireapp.ui.screens.login.LoginScreen
 import com.digi.fireapp.ui.screens.login.LoginViewModel
 import com.digi.fireapp.ui.screens.register.RegisterScreen
 import com.digi.fireapp.ui.screens.register.RegisterViewModel
+import com.digi.fireapp.ui.screens.upload.DocScreen
+import com.digi.fireapp.ui.screens.upload.DocViewModel
 
 enum class Screen(val route: String) {
     Home("home"),
@@ -24,7 +26,7 @@ enum class Screen(val route: String) {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.Home.route) {
+    NavHost(navController = navController, startDestination = Screen.Document.route) {
         composable(Screen.Login.route) {
             val vm: LoginViewModel = viewModel()
             LoginScreen(
@@ -60,7 +62,12 @@ fun AppNavigation() {
 
         }
         composable(Screen.Document.route) {
-
+            val vm: DocViewModel = viewModel()
+            DocScreen(
+                state = vm.state.collectAsState().value,
+                onEvent = vm::onEvent,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }
