@@ -23,9 +23,30 @@ class DocViewModel(
     private val _state = MutableStateFlow(DocState())
     val state = _state.asStateFlow()
 
+    init {
+        loadDocuments()
+    }
+
     fun onEvent(event: DocEvent) {
         when (event) {
-            is DocEvent.UploadImage -> uploadToCloud(event.uri)
+            is DocEvent.UploadImage -> {
+                uploadToCloud(event.uri)
+            }
+
+            is DocEvent.SetImage -> {
+                _state.update { it.copy(selectedImage = event.uri) }
+            }
+
+            DocEvent.Reset -> {
+                _state.update {
+                    it.copy(
+                        uploadStatus = UploadStatus.IDLE,
+                        selectedImage = null,
+                        progress = 0,
+                        error = "",
+                    )
+                }
+            }
         }
     }
 
@@ -47,9 +68,10 @@ class DocViewModel(
                             mimetype = mimeType,
                             timestamp = System.currentTimeMillis()
                         )
-                        db.collection(COLL_NOTES).add(doc)
+                        db.collection(COLL_UPLOADS).add(doc)
                             .addOnSuccessListener {
                                 _state.update { state -> state.copy(uploadStatus = UploadStatus.SUCCESS) }
+                                loadDocuments()
                             }
                             .addOnFailureListener {
                                 _state.update { state ->
@@ -65,7 +87,7 @@ class DocViewModel(
                     }
             }
             .addOnFailureListener {
-                _state.update { state->
+                _state.update { state ->
                     state.copy(
                         uploadStatus = UploadStatus.ERROR,
                         error = it.message ?: "some error occurred"
@@ -83,6 +105,31 @@ class DocViewModel(
                 }
             }
 
+    }
+
+    private fun loadDocuments() {
+        _state.update {
+            it.copy(
+                documentStatus = DocumentStatus.LOADING,
+                documents = emptyList()
+            )
+        }
+        db.collection(COLL_UPLOADS).get()
+            .addOnSuccessListener { querySnapshot ->
+                for (doc in querySnapshot) {
+                    val cDoc = doc.toObject(CDoc::class.java)
+                    _state.update { state ->
+                        state.copy(
+                            documents = state.documents + cDoc
+                        )
+                    }
+                }
+                _state.update { it.copy(documentStatus = DocumentStatus.SUCCESS) }
+            }
+            .addOnFailureListener {
+                Log.e("DocViewModel", "Error loading documents ${it.message}")
+                _state.update { state -> state.copy(documentStatus = DocumentStatus.ERROR) }
+            }
     }
 
     companion object {

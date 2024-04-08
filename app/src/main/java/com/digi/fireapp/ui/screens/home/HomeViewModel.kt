@@ -1,6 +1,7 @@
 package com.digi.fireapp.ui.screens.home
 
 import androidx.lifecycle.ViewModel
+import com.digi.fireapp.data.CDoc
 import com.digi.fireapp.data.CNote
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -63,12 +64,29 @@ class HomeViewModel(
         db.collection(COLL_UPLOADS)
             .get()
             .addOnFailureListener {
-
+                _state.update { state ->
+                    state.copy(
+                        error = it.message ?: "Some error occurred",
+                        docListState = DocumentListState.ERROR,
+                    )
+                }
             }
-            .addOnSuccessListener {
-                // extract all data to an array list and update the state
+            .addOnSuccessListener { querySnapshot ->
+                for (doc in querySnapshot) {
+                    val upload = doc.toObject(CDoc::class.java)
+                    _state.update { state ->
+                        state.copy(documentList = state.documentList + upload)
+                    }
+                }
+                _state.update { state ->
+                    state.copy(
+                        docListState = DocumentListState.SUCCESS,
+                        totalDocuments = state.documentList.size,
+                    )
+                }
             }
     }
+
 
     companion object {
         const val COLL_NOTES = "notes"

@@ -26,7 +26,7 @@ enum class Screen(val route: String) {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.Document.route) {
+    NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(Screen.Login.route) {
             val vm: LoginViewModel = viewModel()
             LoginScreen(
