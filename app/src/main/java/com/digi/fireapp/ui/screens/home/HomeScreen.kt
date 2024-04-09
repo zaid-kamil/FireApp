@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,21 +59,16 @@ fun HomeScreen(
                 Text("FireApp Menu", modifier = Modifier.padding(16.dp))
                 Text(text = "Welcome ${state.username}", modifier = Modifier.padding(16.dp))
                 Divider()
-                NavigationDrawerItem(
-                    label = { Text(text = "Notes") },
+                NavigationDrawerItem(label = { Text(text = "Notes") },
                     selected = true,
-                    onClick = { onNavigateToNotes() }
-                )
+                    onClick = { onNavigateToNotes() })
                 NavigationDrawerItem(label = { Text(text = "Uploads") },
                     selected = false,
-                    onClick = { onNavigateToDocuments() }
-                )
+                    onClick = { onNavigateToDocuments() })
                 Spacer(modifier = Modifier.weight(1f))
-                NavigationDrawerItem(
-                    label = { Text(text = "Logout") },
+                NavigationDrawerItem(label = { Text(text = "Logout") },
                     selected = false,
-                    onClick = { onLogout() }
-                )
+                    onClick = { onLogout() })
             }
         },
         modifier = Modifier.fillMaxSize(),
@@ -96,23 +92,15 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Text("FireApp", style = MaterialTheme.typography.titleLarge)
                 }
-                Text("Welcome ${state.username}")
-                Spacer(modifier = Modifier.height(24.dp))
-                if (state.noteListState == NoteListState.LOADING) {
-                    Text("Loading notes...")
-                } else {
-                    NoteDisplayArea(state = state, onNavigateToNotes = onNavigateToNotes)
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-                if (state.docListState == DocumentListState.LOADING) {
-                    Text("Loading documents...")
-                } else {
-                    DocumentDisplayArea(
-                        state = state,
-                        onNavigateToDocuments = onNavigateToDocuments
-                    )
-                }
 
+                Spacer(modifier = Modifier.height(24.dp))
+                NoteDisplayArea(
+                    state = state, onEvent = onEvent, onNavigateToNotes = onNavigateToNotes
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                DocumentDisplayArea(
+                    state = state, onNavigateToDocuments = onNavigateToDocuments
+                )
             }
         }
     }
@@ -121,78 +109,86 @@ fun HomeScreen(
 @Composable
 fun NoteDisplayArea(
     state: HomeState,
+    onEvent: (HomeEvent) -> Unit,
     onNavigateToNotes: () -> Unit,
 ) {
-    LazyRow(
-        modifier = Modifier.height(200.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(state.notes) { note ->
-            Card(onClick = { /*TODO*/ }, modifier = Modifier.height(200.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(note.title, style = MaterialTheme.typography.headlineMedium)
-                    Text(note.content)
+    if (state.noteListState == NoteListState.LOADING) {
+        Text("Loading notes...")
+        CircularProgressIndicator()
+    } else {
+        LazyRow(
+            modifier = Modifier.height(200.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(state.notes) { note ->
+                Card(onClick = { /*TODO*/ }, modifier = Modifier.height(200.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(note.title, style = MaterialTheme.typography.headlineMedium)
+                        Text(note.content)
+                    }
                 }
             }
-        }
-        item {
-            Card(
-                onClick = { onNavigateToNotes() },
-                modifier = Modifier.size(200.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
+            item {
+                Card(
+                    onClick = {
+                        onNavigateToNotes()
+                    }, modifier = Modifier.size(200.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle,
-                        contentDescription = "add",
-                        modifier = Modifier.size(72.dp)
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = "add",
+                            modifier = Modifier.size(72.dp)
+                        )
+                    }
                 }
             }
         }
     }
+
 }
+
 
 @Composable
 fun DocumentDisplayArea(
     state: HomeState,
     onNavigateToDocuments: () -> Unit,
 ) {
-    LazyRow(
-        modifier = Modifier.height(200.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(state.documentList) { doc ->
-            Card(
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-            ) {
-                AsyncImage(
-                    model = doc.url,
-                    contentDescription = doc.name,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(150.dp)
-                        .clip(MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Crop,
-                )
-            }
-        }
-        item {
-            Card(
-                onClick = { onNavigateToDocuments() },
-                modifier = Modifier.size(200.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
+    if (state.docListState == DocumentListState.LOADING) {
+        Text("Loading documents...")
+    } else {
+        LazyRow(
+            modifier = Modifier.height(200.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(state.documentList) { doc ->
+                Card(
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle,
-                        contentDescription = "add",
-                        modifier = Modifier.size(72.dp)
+                    AsyncImage(
+                        model = doc.url,
+                        contentDescription = doc.name,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(150.dp)
+                            .clip(MaterialTheme.shapes.medium),
+                        contentScale = ContentScale.Crop,
                     )
+                }
+            }
+            item {
+                Card(
+                    onClick = { onNavigateToDocuments() }, modifier = Modifier.size(200.dp)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = "add",
+                            modifier = Modifier.size(72.dp)
+                        )
+                    }
                 }
             }
         }

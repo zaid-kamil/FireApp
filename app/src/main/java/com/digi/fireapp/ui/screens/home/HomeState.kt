@@ -23,4 +23,6 @@ data class HomeState(
     val documentList: List<CDoc> = emptyList(),
     val noteListState: NoteListState = NoteListState.LOADING,
     val docListState: DocumentListState = DocumentListState.LOADING,
+    val noteTitle: String = "",
+    val noteContent: String = "",
 )
